@@ -12,8 +12,10 @@ fastapi = "^0.88.0"
 uvicorn = {extras = ["standard"], version = "^0.20.0"}
 python-multipart = "^0.0.5"
 alembic = "^1.9.1"
-sqlalchemy = "^1.4.45"
+sqlalchemy = "1.4.41"
 mysqlclient = "^2.1.1"
+ormar = "^0.12.0"
+aiomysql = "^0.1.1"
 
 
 [build-system]

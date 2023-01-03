@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
-from sqlalchemy import Column
-from sqlalchemy.dialects.mysql import VARCHAR, TEXT, TIMESTAMP
-
-from .base import Base
-from .mixins import (
-    MysqlPrimaryKeyMixin,
-    MysqlTimestampsMixin,
-)
+import ormar
+import datetime
+from .base import MainMeta
+from .writer import Writer
+from typing import Optional
 
 
-class Book(Base, MysqlPrimaryKeyMixin, MysqlTimestampsMixin):
-    __tablename__ = "books"
+class Book(ormar.Model):
+    class Meta(MainMeta):
+        pass
 
-    title = Column("title", VARCHAR(255))
-    writer = Column("writer", VARCHAR(255))
-    description = Column("description", TEXT())
-    publish_date = Column("publish_date", TIMESTAMP())
-    rating = Column("writer", VARCHAR(255))
-    cover_filename = Column("cover_filename", VARCHAR(255))
-    genres = Column("genres", TEXT())
+    id: int = ormar.Integer(primary_key=True)
+    title: str = ormar.String(max_length=100)
+    writer: Optional[Writer] = ormar.ForeignKey(Writer)
+    description: str = ormar.String(max_length=500)
+    publish_date = ormar.DateTime(default=datetime.datetime.now())
+    rating = ormar.Integer(maximum=10)
+    cover_filename: str = ormar.String(max_length=1000)
+    genres: str = ormar.String(max_length=1000)
+    created_at = ormar.DateTime(default=datetime.datetime.now())
