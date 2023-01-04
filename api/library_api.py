@@ -1,17 +1,26 @@
 import shutil
 from typing import Optional
-from schemas import Book, GetBook, User
+from schemas import GetBook, User
+from database.models import Book
 from fastapi import APIRouter, UploadFile, File, Form, Request
 
 library_router = APIRouter()
 
 
-@library_router.post("/book")
-async def create_book(item: Book):
-    return item
+@library_router.get("/book", response_model=GetBook)
+async def get_book():
+    user = {'id': 225, 'username': 'Sloth'}
+    book = {'title': 'TestTitle1', 'writer': 'TestWriter1'}
+    return GetBook(user=user, book=book)
 
 
-@library_router.post("/cover")
+@library_router.post("/book", response_model=Book)
+async def create_book(book: Book):
+    await book.save()
+    return book
+
+
+@library_router.post("/book+cover")
 async def create_book_with_cover(title: str = Form(...),
                                  writer: str = Form(...),
                                  description: Optional[str] = Form(None),
@@ -38,10 +47,3 @@ async def create_book_with_cover(title: str = Form(...),
 async def get_test(req: Request):
     print(req.base_url)
     return {}
-
-
-@library_router.get("/book", response_model=GetBook)
-async def get_book():
-    user = {'id': 225, 'username': 'Sloth'}
-    book = {'title': 'TestTitle1', 'writer': 'TestWriter1'}
-    return GetBook(user=user, book=book)

@@ -1,3 +1,4 @@
+import uvicorn
 from fastapi import FastAPI
 from api import library_router
 from database.models.base import database, metadata, engine
@@ -27,3 +28,6 @@ async def root():
 
 
 app.include_router(library_router)
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="127.0.0.1", port=8080, log_level="debug")

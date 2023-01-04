@@ -1,8 +1,8 @@
 """add_book_and_writers_tables
 
-Revision ID: 867b0e038539
+Revision ID: 4eba5ff01088
 Revises: 
-Create Date: 2023-01-03 14:28:41.585719
+Create Date: 2023-01-04 11:44:41.369801
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '867b0e038539'
+revision = '4eba5ff01088'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -22,20 +22,20 @@ def upgrade() -> None:
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=100), nullable=False),
     sa.Column('lastname', sa.String(length=100), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('(CURRENT_TIMESTAMP())'), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('books',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('title', sa.String(length=100), nullable=False),
-    sa.Column('writer', sa.Integer(), nullable=True),
+    sa.Column('writer_id', sa.Integer(), nullable=True),
     sa.Column('description', sa.String(length=500), nullable=False),
-    sa.Column('publish_date', sa.DateTime(), nullable=True),
+    sa.Column('publish_date', sa.Date(), server_default=sa.text('(CURRENT_DATE())'), nullable=True),
     sa.Column('rating', sa.Integer(), nullable=False),
     sa.Column('cover_filename', sa.String(length=1000), nullable=False),
     sa.Column('genres', sa.String(length=1000), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=True),
-    sa.ForeignKeyConstraint(['writer'], ['writers.id'], name='fk_books_writers_id_writer'),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('(CURRENT_TIMESTAMP())'), nullable=True),
+    sa.ForeignKeyConstraint(['writer_id'], ['writers.id'], name='fk_books_writers_id_writer_id'),
     sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###
