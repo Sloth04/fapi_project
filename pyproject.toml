@@ -16,6 +16,7 @@ sqlalchemy = "1.4.41"
 mysqlclient = "^2.1.1"
 ormar = "^0.12.0"
 aiomysql = "^0.1.1"
+filetype = "^1.2.0"
 
 
 [build-system]
