@@ -1,46 +1,32 @@
-import shutil
-from typing import Optional
-from schemas import GetBook, User
+import datetime
+from typing import Union, Optional
 from database.models import Book
-from fastapi import APIRouter, UploadFile, File, Form, Request
+from fastapi import APIRouter, UploadFile, File, Form, Request, BackgroundTasks, HTTPException
+from services import save_book
 
 library_router = APIRouter()
 
 
-@library_router.get("/book", response_model=GetBook)
-async def get_book():
-    user = {'id': 225, 'username': 'Sloth'}
-    book = {'title': 'TestTitle1', 'writer': 'TestWriter1'}
-    return GetBook(user=user, book=book)
+@library_router.get("/book/{book_pk}")
+async def get_book(book_pk: int):
+    return await Book.objects.select_related('writer').get(pk=book_pk)
 
 
 @library_router.post("/book", response_model=Book)
-async def create_book(book: Book):
-    await book.save()
-    return book
-
-
-@library_router.post("/book+cover")
-async def create_book_with_cover(title: str = Form(...),
-                                 writer: str = Form(...),
-                                 description: Optional[str] = Form(None),
-                                 publish_date: Optional[str] = Form(None),
-                                 rating: Optional[int] = Form(None),
-                                 cover_filename: Optional[str] = Form(None),
-                                 file: UploadFile = File(...)):
-    if cover_filename is None:
-        cover_filename = file.filename
-    else:
-        file.filename = cover_filename
-    book_item = Book(title=title,
-                     writer=writer,
-                     description=description,
-                     publish_date=publish_date,
-                     rating=rating,
-                     cover_filename=cover_filename)
-    with open(f'{file.filename}', "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
-    return {"book_item": book_item}
+async def create_book_with_cover(background_tasks: BackgroundTasks,
+                                 title: str = Form(...),
+                                 writer_id: Optional[int] = Form(default=None),
+                                 description: Union[str, None] = Form(default=None),
+                                 publish_date: datetime.date = Form(default=datetime.date.today()),
+                                 rating: Optional[int] = Form(default=None),
+                                 cover_filename: Optional[str] = Form(default=None),
+                                 genre: Optional[str] = Form(default=None),
+                                 cover_file: Optional[UploadFile] = File(default=None),
+                                 book_file: UploadFile = File(...)
+                                 ):
+    """ Add book """
+    return await save_book(title, writer_id, description, publish_date, rating, genre, cover_filename, cover_file,
+                           book_file, background_tasks)
 
 
 @library_router.get("/test")

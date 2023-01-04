@@ -63,3 +63,4 @@ coverage.xml
 
 docker/.docker_env
 /.env
+/media/
